@@ -2,14 +2,14 @@ import 'dart:convert';
 
 // Este archivo define el modelo de datos y la lógica de validación para el registro.
 class RegistrationModel {
-  String _fullName = '';
+  String _name = '';
   String _email = '';
   String _password = '';
   String _gender = ''; // 'Masculino' o 'Femenino'
   bool _termsAccepted = false;
   String _errorMessage = '';
 
-  String get fullName => _fullName;
+  String get name => _name;
   String get email => _email;
   String get password => _password;
   String get gender => _gender;
@@ -20,8 +20,8 @@ class RegistrationModel {
     _errorMessage = message;
   }
 
-  void setFullName(String value) {
-    _fullName = value;
+  void setName(String value) {
+    _name = value;
   }
 
   void setEmail(String value) {
@@ -43,7 +43,7 @@ class RegistrationModel {
   /// Método para convertir el modelo en un mapa para JSON
   Map<String, dynamic> toJson() {
     return {
-      'full_name': _fullName,
+      'name': _name,
       'email': _email,
       'password': _password,
       'gender': _gender,
@@ -55,7 +55,7 @@ class RegistrationModel {
   bool validateRegistration() {
     _errorMessage = ''; // Limpiar mensajes de error previos
 
-    if (_fullName.isEmpty) {
+    if (_name.isEmpty) {
       _errorMessage = 'El nombre completo no puede estar vacío.';
       return false;
     }

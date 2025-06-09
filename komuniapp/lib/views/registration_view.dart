@@ -39,7 +39,7 @@ class RegistrationView extends StatelessWidget {
               const SizedBox(height: 32.0),
               // Campo Nombre Completo
               TextField(
-                onChanged: registrationController.setFullName,
+                onChanged: registrationController.setName,
                 decoration: InputDecoration(
                   hintText: 'Ingresa tu nombre completo',
                   filled: true,
@@ -180,9 +180,7 @@ class RegistrationView extends StatelessWidget {
                               margin: const EdgeInsets.all(10),
                             ),
                           );
-                          Navigator.pop(
-                            context,
-                          ); // Volver a la pantalla de login
+                          Navigator.pop(context);
                         }
                       },
                 style: ElevatedButton.styleFrom(

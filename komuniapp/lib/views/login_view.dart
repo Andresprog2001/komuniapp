@@ -47,9 +47,9 @@ class LoginView extends StatelessWidget {
               const SizedBox(height: 48.0),
               // Campo de Usuario
               TextField(
-                onChanged: loginController.setUsername,
+                onChanged: loginController.setEmail,
                 decoration: InputDecoration(
-                  hintText: 'Ingresa tu usuario',
+                  hintText: 'Ingresa tu email',
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
@@ -107,6 +107,7 @@ class LoginView extends StatelessWidget {
                     ? null // Deshabilitar el botón mientras carga
                     : () async {
                         bool success = await loginController.login();
+                        print("este es el contex:  $context");
                         if (success) {
                           // Navegar a la siguiente pantalla si el login es exitoso
                           // Por ejemplo: Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
@@ -121,8 +122,8 @@ class LoginView extends StatelessWidget {
                               margin: const EdgeInsets.all(10),
                             ),
                           );
-                        } else {
-                          // El mensaje de error ya se muestra en el UI a través del Provider
+
+                          Navigator.pushReplacementNamed(context, '/contents');
                         }
                       },
                 style: ElevatedButton.styleFrom(
@@ -175,48 +176,6 @@ class LoginView extends StatelessWidget {
             ],
           ),
         ),
-      ),
-      // Barra de navegación inferior (como en la imagen)
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.home, color: Colors.deepPurple),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.search, color: Colors.deepPurple),
-              onPressed: () {},
-            ),
-            const SizedBox(width: 48), // Espacio para el botón flotante
-            IconButton(
-              icon: const Icon(Icons.person, color: Colors.deepPurple),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.settings, color: Colors.deepPurple),
-              onPressed: () {},
-            ),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Acción del botón flotante
-        },
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            30.0,
-          ), // Botón flotante redondeado
-        ),
-        child: const Icon(Icons.add),
       ),
     );
   }

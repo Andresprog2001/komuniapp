@@ -1,14 +1,13 @@
-// Este archivo maneja la lógica de negocio y la interacción entre el modelo y la vista de registro.
 import 'package:flutter/material.dart';
 import 'package:komuniapp/models/registration_model.dart';
-import 'package:komuniapp/services/user_api_service.dart';
+import 'package:komuniapp/services/user_api_service.dart'; // IMPORTAR EL NUEVO SERVICIO
 
 class RegistrationController extends ChangeNotifier {
   final RegistrationModel _model = RegistrationModel();
-  final UserApiService _apiService = UserApiService();
+  final UserApiService _apiService = UserApiService(); // INSTANCIAR EL SERVICIO
   bool _isLoading = false;
 
-  String get fullName => _model.fullName;
+  String get name => _model.name;
   String get email => _model.email;
   String get password => _model.password;
   String get gender => _model.gender;
@@ -16,8 +15,8 @@ class RegistrationController extends ChangeNotifier {
   String get errorMessage => _model.errorMessage;
   bool get isLoading => _isLoading;
 
-  void setFullName(String value) {
-    _model.setFullName(value);
+  void setName(String value) {
+    _model.setName(value);
   }
 
   void setEmail(String value) {
@@ -32,29 +31,31 @@ class RegistrationController extends ChangeNotifier {
     if (value != null) {
       _model.setGender(value);
     }
-    // Notificar para actualizar los RadioListTile
+    notifyListeners();
   }
 
   void setTermsAccepted(bool? value) {
     _model.setTermsAccepted(value ?? false);
-    // Notificar para actualizar el Checkbox
+    notifyListeners();
   }
 
+  /// Realiza el proceso de registro de usuario usando el servicio API.
   Future<bool> registerUser() async {
     _isLoading = true;
     _model.errorMessage = ''; // Limpiar errores previos antes de intentar
+    notifyListeners();
 
     if (!_model.validateRegistration()) {
       _isLoading = false;
-
+      notifyListeners();
       return false;
     }
 
     try {
-      // <<-- AHORA LLAMAMOS AL SERVICIO API REAL -->>
+      // LLAMAMOS AL SERVICIO API REAL
       final success = await _apiService.registerUser(_model);
       _isLoading = false;
-
+      notifyListeners();
       return success;
     } catch (e) {
       // Manejar el error reportado por el servicio
@@ -63,7 +64,7 @@ class RegistrationController extends ChangeNotifier {
         '',
       ); // Limpiar "Exception: "
       _isLoading = false;
-
+      notifyListeners();
       return false;
     }
   }

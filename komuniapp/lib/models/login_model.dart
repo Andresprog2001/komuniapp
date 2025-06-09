@@ -1,25 +1,29 @@
 class LoginModel {
-  String _username = '';
+  String _email = '';
   String _password = '';
   String _errorMessage = '';
 
-  String get username => _username;
+  String get email => _email;
   String get password => _password;
   String get errorMessage => _errorMessage;
 
-  void setUsername(String value) {
-    _username = value;
+  void setEmail(String value) {
+    _email = value;
   }
 
   void setPassword(String value) {
     _password = value;
   }
 
+  set errorMessage(String message) {
+    _errorMessage = message;
+  }
+
   /// Valida las credenciales de inicio de sesión.
   bool validateCredentials() {
     _errorMessage = ''; // Limpiar mensajes de error previos
 
-    if (_username.isEmpty) {
+    if (_email.isEmpty) {
       _errorMessage = 'El usuario no puede estar vacío.';
       return false;
     }
