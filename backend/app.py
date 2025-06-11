@@ -219,7 +219,6 @@ def contents_list():
         # Para obtener resultados como diccionarios
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         if request.method == 'GET':
-            # <<-- OBTENEMOS 'file'
             cursor.execute(
                 "SELECT id, title, description, author, category, file_url, user_id FROM contents")
             contents = cursor.fetchall()
@@ -269,11 +268,11 @@ def contents_list():
         if conn and conn.open:
             conn.close()
 
-# <<-- NUEVO ENDPOINT PARA EL PERFIL DE USUARIO BUSCANDO POR ID -->>
+#  NUEVO ENDPOINT PARA EL PERFIL DE USUARIO BUSCADO POR ID
 
 
 @app.route('/api/profile', methods=['GET'])
-@jwt_required  # Proteger este endpoint con JWT
+@jwt_required  # Protege este endpoint con JWT
 def get_user_profile():
     conn = None
     cursor = None
@@ -297,7 +296,6 @@ def get_user_profile():
             user['created_at'], datetime.datetime) else str(user['created_at'])
 
         profile_data = {
-            # Usamos 'name' de la DB, mapeado a 'full_name' en Flutter
             'name': user['name'],
             'email': user['email'],
             'created_at': created_at_str,

@@ -30,39 +30,27 @@ class _UploadContentViewState extends State<UploadContentView> {
   @override
   void initState() {
     super.initState();
-    // No hay necesidad de inicializar TextEditingController aquí.
   }
 
   @override
   void dispose() {
     super.dispose();
-    // <<-- ELIMINADO: Ya no se llama a dispose para TextEditingController -->>
   }
 
   @override
   Widget build(BuildContext context) {
     final uploadController = Provider.of<UploadContentController>(context);
 
-    // <<-- ELIMINADO: Lógica de sincronización con TextEditingController -->>
-    // if (_titleController.text != uploadController.title) {
-    //   _titleController.text = uploadController.title;
-    // }
-    // if (_authorController.text != uploadController.author) {
-    //   _authorController.text = uploadController.author;
-    // }
-    // if (_linkController.text != uploadController.fileUrl) {
-    //   _linkController.text = uploadController.fileUrl;
-    // }
-
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           'KomuniApp',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Colors.deepPurple,
         centerTitle: true,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -152,7 +140,10 @@ class _UploadContentViewState extends State<UploadContentView> {
                   onPressed: () {
                     // Acción al buscar archivo (mantener como está o implementar lógica de selección de archivo)
                   },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
                   child: const Text('Buscar'),
                 ),
               ],
@@ -237,6 +228,7 @@ class _UploadContentViewState extends State<UploadContentView> {
                     horizontal: 30,
                     vertical: 15,
                   ),
+                  foregroundColor: Colors.white,
                 ),
                 child: uploadController.isLoading
                     ? const CircularProgressIndicator(
@@ -249,65 +241,6 @@ class _UploadContentViewState extends State<UploadContentView> {
           ],
         ),
       ),
-
-      // BARRA DE NAVEGACION INFERIOR (Asegúrate de que estas rutas sean correctas)
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.deepPurple,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.home, color: Colors.white),
-              onPressed: () {
-                // Acción para Home
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.search, color: Colors.white),
-              onPressed: () {
-                // <<-- Usar Navigator.pushNamed para volver a ContentView -->>
-                Navigator.pushNamed(
-                  context,
-                  '/knowledge',
-                ); // Asumiendo que '/knowledge' va a ContentView
-              },
-            ),
-            const SizedBox(width: 48), // Espacio para el FAB
-            IconButton(
-              icon: const Icon(Icons.person, color: Colors.white),
-              onPressed: () {
-                // Acción para perfil
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
-              onPressed: () {
-                // Acción para configuración
-              },
-            ),
-          ],
-        ),
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Llama al método para limpiar el formulario del controlador
-          uploadController.clearForm();
-          // NOTA: Como ya no usamos TextEditingControllers explícitos para la limpieza,
-          // los campos de texto se actualizarán cuando el widget se reconstruya
-          // debido a la notificación del Provider o al volver a la vista.
-        },
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30.0),
-        ),
-        child: const Icon(Icons.add),
-      ),
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

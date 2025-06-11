@@ -17,17 +17,17 @@ class _ContentViewState extends State<ContentView> {
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(() {
-      Provider.of<ContentController>(
-        context,
-        listen: false,
-      ).filterContents(_searchController.text);
-    });
+    // _searchController.addListener(() {
+    //   Provider.of<ContentController>(
+    //     context,
+    //     listen: false,
+    //   ).filterContents(_searchController.text);
+    // });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Asegúrate de que el fetchContents se llame cuando la vista se inicializa.
-      Provider.of<ContentController>(context, listen: false).fetchContents();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   // Asegúrate de que el fetchContents se llame cuando la vista se inicializa.
+    //   Provider.of<ContentController>(context, listen: false).fetchContents();
+    // });
   }
 
   void _filterContent(String query) {
@@ -54,8 +54,9 @@ class _ContentViewState extends State<ContentView> {
           'KomuniApp',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Colors.deepPurple,
         centerTitle: true,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: [
@@ -86,6 +87,7 @@ class _ContentViewState extends State<ContentView> {
                       horizontal: 16,
                       vertical: 16,
                     ),
+                    foregroundColor: Colors.white,
                   ),
                   child: const Text("Buscar"),
                 ),
@@ -194,27 +196,12 @@ class _ContentViewState extends State<ContentView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.home, color: Colors.white),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.search, color: Colors.white),
-              onPressed: () {
-                _searchController.clear();
-                _filterContent('');
-              },
-            ),
             const SizedBox(width: 48),
             IconButton(
               icon: const Icon(Icons.person, color: Colors.white),
               onPressed: () {
                 Navigator.pushNamed(context, "/user_profile");
               },
-            ),
-            IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
-              onPressed: () {},
             ),
           ],
         ),

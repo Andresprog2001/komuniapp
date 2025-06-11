@@ -103,29 +103,32 @@ class LoginView extends StatelessWidget {
                 ),
               // Botón Ingresar
               ElevatedButton(
-                onPressed: loginController.isLoading
-                    ? null // Deshabilitar el botón mientras carga
-                    : () async {
-                        bool success = await loginController.login();
-                        print("este es el contex:  $context");
-                        if (success) {
-                          // Navegar a la siguiente pantalla si el login es exitoso
-                          // Por ejemplo: Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text('¡Inicio de sesión exitoso!'),
-                              backgroundColor: Colors.green[700],
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              margin: const EdgeInsets.all(10),
-                            ),
-                          );
+                onPressed: () {
+                  // Navegar a la pantalla de registro
+                  Navigator.pushNamed(context, '/contents');
+                },
+                // onPressed: loginController.isLoading
+                //     ? null // Deshabilitar el botón mientras carga
+                //     : () async {
+                //         bool success = await loginController.login();
+                //         print("este es el contex:  $context");
+                //         if (success) {
+                //           // Navegar a la siguiente pantalla si el login es exitoso
+                //           ScaffoldMessenger.of(context).showSnackBar(
+                //             SnackBar(
+                //               content: const Text('¡Inicio de sesión exitoso!'),
+                //               backgroundColor: Colors.green[700],
+                //               behavior: SnackBarBehavior.floating,
+                //               shape: RoundedRectangleBorder(
+                //                 borderRadius: BorderRadius.circular(10),
+                //               ),
+                //               margin: const EdgeInsets.all(10),
+                //             ),
+                //           );
 
-                          Navigator.pushReplacementNamed(context, '/contents');
-                        }
-                      },
+                //           Navigator.pushReplacementNamed(context, '/contents');
+                //         }
+                //       },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black, // Color de fondo del botón
                   foregroundColor: Colors.white, // Color del texto del botón
