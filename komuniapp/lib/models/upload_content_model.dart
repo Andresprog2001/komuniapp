@@ -1,16 +1,21 @@
 // lib/models/upload_content_model.dart
-class UploadContentModel {
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+
+class UploadContentModel extends ChangeNotifier {
   String _title = '';
   String _description = '';
   String _author = '';
-  String _fileUrl = ''; // <<-- CAMBIO: '_file' a '_fileUrl'
+  String _fileUrl = '';
+  Uint8List? _fileBytes;
   String _category = '';
   String _errorMessage = '';
 
   String get title => _title;
   String get description => _description;
   String get author => _author;
-  String get fileUrl => _fileUrl; // <<-- CAMBIO: 'file' a 'fileUrl'
+  String get fileUrl => _fileUrl;
+  Uint8List? get fileBytes => _fileBytes;
   String get category => _category;
   String get errorMessage => _errorMessage;
 
@@ -31,11 +36,18 @@ class UploadContentModel {
   }
 
   void setFileUrl(String value) {
-    // <<-- CAMBIO: 'setFile' a 'setFileUrl'
     _fileUrl = value;
   }
 
+  void setFileBytes(Uint8List? bytes) {
+    _fileBytes = bytes;
+  }
+
   void setCategory(String value) {
+    _category = value;
+  }
+
+  void setErrorMessage(String value) {
     _category = value;
   }
 
@@ -55,10 +67,14 @@ class UploadContentModel {
       return false;
     }
     if (_fileUrl.isEmpty) {
-      // <<-- CAMBIO: '_file' a '_fileUrl'
       _errorMessage = 'El enlace o archivo no puede estar vacío.';
       return false;
     }
+    // if (_fileBytes == null || _fileUrl.isEmpty) {
+    //   _errorMessage = 'Por favor, selecciona un archivo para cargar.';
+    //   return false;
+    // }
+
     if (_category.isEmpty) {
       _errorMessage = 'Selecciona una categoría.';
       return false;
@@ -72,7 +88,8 @@ class UploadContentModel {
       'title': _title,
       'description': _description,
       'author': _author,
-      'file_url': _fileUrl, // <<-- CAMBIO CLAVE AQUÍ: 'file' a 'file_url'
+      'file_url': _fileUrl,
+      'file_bytes': _fileBytes != null ? _fileBytes!.toString() : null,
       'category': _category,
     };
   }

@@ -180,7 +180,7 @@ class RegistrationView extends StatelessWidget {
                               margin: const EdgeInsets.all(10),
                             ),
                           );
-                          Navigator.pop(context);
+                          Navigator.pushReplacementNamed(context, '/login');
                         }
                       },
                 style: ElevatedButton.styleFrom(

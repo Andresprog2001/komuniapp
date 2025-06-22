@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:komuniapp/controllers/content_controller.dart';
-import 'package:komuniapp/models/content_model.dart'; // Importa el modelo renombrado
+import 'package:komuniapp/controllers/login_controller.dart';
+import 'package:komuniapp/models/content_model.dart';
 import 'package:komuniapp/views/upload_content_view.dart';
+import 'package:komuniapp/views/content_detail_view.dart';
+import 'package:komuniapp/views/login_view.dart';
 
 class ContentView extends StatefulWidget {
   const ContentView({super.key});
@@ -13,21 +16,24 @@ class ContentView extends StatefulWidget {
 
 class _ContentViewState extends State<ContentView> {
   final TextEditingController _searchController = TextEditingController();
+  late LoginController _loginController;
 
   @override
   void initState() {
     super.initState();
-    // _searchController.addListener(() {
-    //   Provider.of<ContentController>(
-    //     context,
-    //     listen: false,
-    //   ).filterContents(_searchController.text);
-    // });
+    _loginController = Provider.of<LoginController>(context, listen: false);
 
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   // Asegúrate de que el fetchContents se llame cuando la vista se inicializa.
-    //   Provider.of<ContentController>(context, listen: false).fetchContents();
-    // });
+    _searchController.addListener(() {
+      Provider.of<ContentController>(
+        context,
+        listen: false,
+      ).filterContents(_searchController.text);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Llama a fetchContents después de que la vista se haya construido
+      Provider.of<ContentController>(context, listen: false).fetchContents();
+    });
   }
 
   void _filterContent(String query) {
@@ -49,14 +55,22 @@ class _ContentViewState extends State<ContentView> {
 
     return Scaffold(
       backgroundColor: Colors.grey[300],
+
       appBar: AppBar(
         title: const Text(
           'KomuniApp',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.deepPurple,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white), //
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.logout),
+        //     onPressed: () async {
+        //       await _loginController.logout(context);
+        //     },
+        //   ),
+        // ],
       ),
       body: Column(
         children: [
@@ -104,7 +118,7 @@ class _ContentViewState extends State<ContentView> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
-                        'Error al cargar contenidos: ${contentController.errorMessage}',
+                        'VIEW: ${contentController.errorMessage}',
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.red, fontSize: 16),
                       ),
@@ -137,47 +151,73 @@ class _ContentViewState extends State<ContentView> {
                                 color: Colors.white,
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  child: Row(
+                                    // <<-- ¡AQUÍ ESTÁ EL CAMBIO CLAVE! Usa un Row para el layout horizontal
                                     children: [
-                                      Text(
-                                        content.title,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
+                                      Expanded(
+                                        // <<-- Permite que la columna de texto ocupe el espacio disponible
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              content.title,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              content.category,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.deepPurple,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 4,
+                                            ), // Mantenemos este SizedBox para el espacio vertical
+                                            Text(
+                                              'Autor: ${content.author}',
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        content.category,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.deepPurple,
+                                      const SizedBox(
+                                        width: 10,
+                                      ), // Espacio horizontal entre el texto y el botón
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ContentDetailView(
+                                                    content: content,
+                                                  ),
+                                            ),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.blue,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Autor: ${content.author}',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                      Text(
-                                        'Descripción: ${content.description}',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                      Text(
-                                        'URL: ${content.fileUrl}',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.blue,
-                                        ),
+                                        child: const Text('Ver Detalles'),
                                       ),
                                     ],
                                   ),
@@ -196,6 +236,15 @@ class _ContentViewState extends State<ContentView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
+            IconButton(
+              icon: const Icon(
+                Icons.list_alt,
+                color: Colors.white,
+              ), // Nuevo icono: lista con verificación
+              onPressed: () {
+                Navigator.pushNamed(context, '/registered_contents');
+              },
+            ),
             const SizedBox(width: 48),
             IconButton(
               icon: const Icon(Icons.person, color: Colors.white),

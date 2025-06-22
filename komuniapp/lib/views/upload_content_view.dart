@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:komuniapp/controllers/upload_content_controller.dart';
 import 'package:komuniapp/views/content_view.dart'; // Mantener si se usa en el BottomAppBar
+import 'package:file_picker/file_picker.dart'; // <<<--- AÑADIR ESTA IMPORTACIÓN
 
 class UploadContentView extends StatefulWidget {
   const UploadContentView({super.key});
@@ -12,12 +13,15 @@ class UploadContentView extends StatefulWidget {
 }
 
 class _UploadContentViewState extends State<UploadContentView> {
-  // <<-- ELIMINADO: Ya no se declaran TextEditingController aquí -->>
-  // final _titleController = TextEditingController();
-  // final _authorController = TextEditingController();
-  // final _linkController = TextEditingController();
-
-  // selectedCategory ya no es necesario aquí, el controlador lo manejará.
+  // =========================================================================
+  // TextEditingControllers para cada TextField
+  // Esto permite controlar el texto programáticamente, especialmente para el campo del archivo.
+  // =========================================================================
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _authorController;
+  late TextEditingController
+  _fileDisplayController; // Para mostrar el nombre del archivo
 
   final List<String> categories = [
     'Programación',
@@ -30,16 +34,114 @@ class _UploadContentViewState extends State<UploadContentView> {
   @override
   void initState() {
     super.initState();
+    // =========================================================================
+    // Inicializar los TextEditingControllers en initState
+    // Y conectarlos con los valores actuales del controlador (Provider).
+    // =========================================================================
+    final uploadController = Provider.of<UploadContentController>(
+      context,
+      listen: false,
+    );
+    _titleController = TextEditingController(text: uploadController.title);
+    _descriptionController = TextEditingController(
+      text: uploadController.description,
+    );
+    _authorController = TextEditingController(text: uploadController.author);
+    _fileDisplayController = TextEditingController(
+      text: uploadController.fileUrl,
+    ); // Inicializar con el nombre del archivo actual
   }
 
   @override
   void dispose() {
+    // =========================================================================
+    //  Desechar los TextEditingControllers en dispose
+    // =========================================================================
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _authorController.dispose();
+    _fileDisplayController.dispose();
     super.dispose();
+  }
+
+  // metodo para seleccionar un archivo
+  Future<void> _pickFile() async {
+    final uploadController = Provider.of<UploadContentController>(
+      context,
+      listen: false,
+    );
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type:
+          FileType.custom, // Puedes especificar tipos: .pdf, .docx, .mp4, etc.
+      allowedExtensions: [
+        'pdf',
+        'doc',
+        'docx',
+        'ppt',
+        'pptx',
+        'xls',
+        'xlsx',
+        'txt',
+        'mp4',
+        'mov',
+        'avi',
+        'jpg',
+        'jpeg',
+        'png',
+        'gif',
+      ], // Ejemplos de extensiones
+      allowMultiple: false, // Solo permitir seleccionar un archivo
+    );
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+      if (file.bytes != null) {
+        uploadController.setSelectedFile(file.bytes, file.name);
+        _fileDisplayController.text =
+            file.name; // Actualizar el TextField con el nombre del archivo
+      } else {
+        // Manejar el caso donde los bytes no están disponibles (ej. web con archivos muy grandes)
+        uploadController.setErrorMessage(
+          'No se pudo leer el archivo. Intenta de nuevo.',
+        );
+      }
+    } else {
+      // El usuario canceló la selección de archivos
+      uploadController.clearSelectedFile();
+      _fileDisplayController.clear(); // Limpiar el TextField si se cancela
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Escucha los cambios en el UploadContentController
     final uploadController = Provider.of<UploadContentController>(context);
+
+    if (_titleController.text != uploadController.title) {
+      _titleController.text = uploadController.title;
+      _titleController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _titleController.text.length),
+      );
+    }
+    if (_descriptionController.text != uploadController.description) {
+      _descriptionController.text = uploadController.description;
+      _descriptionController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _descriptionController.text.length),
+      );
+    }
+    if (_authorController.text != uploadController.author) {
+      _authorController.text = uploadController.author;
+      _authorController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _authorController.text.length),
+      );
+    }
+    if (_fileDisplayController.text != uploadController.fileUrl) {
+      // <<<--- CAMBIO CLAVE 5: Usar fileUrl
+      _fileDisplayController.text = uploadController.fileUrl;
+      _fileDisplayController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _fileDisplayController.text.length),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -50,7 +152,9 @@ class _UploadContentViewState extends State<UploadContentView> {
         ),
         backgroundColor: Colors.deepPurple,
         centerTitle: true,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ), // Usar const para IconThemeData
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -76,9 +180,8 @@ class _UploadContentViewState extends State<UploadContentView> {
             ),
             const SizedBox(height: 20),
             TextField(
-              onChanged: uploadController
-                  .setTitle, // Actualizar el controlador directamente
-              controller: TextEditingController(text: uploadController.title),
+              controller: _titleController, // <<<--- Asignar controller
+              onChanged: uploadController.setTitle,
               decoration: const InputDecoration(
                 hintText: 'Ingresa título del trabajo',
                 filled: true,
@@ -88,11 +191,8 @@ class _UploadContentViewState extends State<UploadContentView> {
             ),
             const SizedBox(height: 15),
             TextField(
-              // <<-- ELIMINADO: controller: ya no se usa -->>
-              onChanged: uploadController
-                  .setAuthor, // Actualizar el controlador directamente
-              // <<-- Añadido initialValue para que refleje el estado del controlador -->>
-              controller: TextEditingController(text: uploadController.author),
+              controller: _authorController, // <<<--- Asignar controller
+              onChanged: uploadController.setAuthor,
               decoration: const InputDecoration(
                 hintText: 'Ingresa autor del trabajo',
                 filled: true,
@@ -102,12 +202,10 @@ class _UploadContentViewState extends State<UploadContentView> {
             ),
             const SizedBox(height: 15),
             TextField(
-              onChanged: uploadController
-                  .setDescription, // Actualizar el controlador directamente
-              // <<-- Añadido initialValue para que refleje el estado del controlador -->>
-              controller: TextEditingController(
-                text: uploadController.description,
-              ),
+              controller: _descriptionController,
+              onChanged: uploadController.setDescription,
+              maxLines: 5, // Permite un número ilimitado de líneas
+              keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
                 hintText: 'Ingresa la descripcion del contenido',
                 filled: true,
@@ -120,15 +218,12 @@ class _UploadContentViewState extends State<UploadContentView> {
               children: [
                 Expanded(
                   child: TextField(
-                    // <<-- ELIMINADO: controller: ya no se usa -->>
-                    onChanged: uploadController
-                        .setFileUrl, // Actualizar el controlador directamente
-                    // <<-- Añadido initialValue para que refleje el estado del controlador -->>
-                    controller: TextEditingController(
-                      text: uploadController.fileUrl,
-                    ),
+                    controller:
+                        _fileDisplayController, // <<<--- Asignar controller para el nombre del archivo
+                    readOnly:
+                        true, // Para que el usuario no pueda escribir aquí
                     decoration: const InputDecoration(
-                      hintText: 'Ingresa archivo o enlace',
+                      hintText: 'Selecciona un archivo...',
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(),
@@ -137,14 +232,15 @@ class _UploadContentViewState extends State<UploadContentView> {
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
-                  onPressed: () {
-                    // Acción al buscar archivo (mantener como está o implementar lógica de selección de archivo)
-                  },
+                  onPressed:
+                      _pickFile, // <<<--- Llamar a la nueva función _pickFile
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
-                  child: const Text('Buscar'),
+                  child: const Text(
+                    'Seleccionar Archivo',
+                  ), // <<<--- Cambiar texto del botón
                 ),
               ],
             ),
@@ -170,9 +266,7 @@ class _UploadContentViewState extends State<UploadContentView> {
                           : uploadController.category,
                       onChanged: (value) {
                         if (value != null) {
-                          uploadController.setCategory(
-                            value,
-                          ); // Actualizar el controlador directamente
+                          uploadController.setCategory(value);
                         }
                       },
                     ),
@@ -215,8 +309,9 @@ class _UploadContentViewState extends State<UploadContentView> {
                               margin: const EdgeInsets.all(10),
                             ),
                           );
-                          Navigator.pop(
+                          Navigator.pushReplacementNamed(
                             context,
+                            "/contents",
                           ); // Volver a la pantalla anterior
                         } else {
                           // El mensaje de error ya se muestra en el UI a través del Provider
@@ -232,7 +327,6 @@ class _UploadContentViewState extends State<UploadContentView> {
                 ),
                 child: uploadController.isLoading
                     ? const CircularProgressIndicator(
-                        // Mostrar indicador de carga
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       )
                     : const Text('Cargar contenido'),
